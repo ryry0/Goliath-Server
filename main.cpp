@@ -1,6 +1,6 @@
 /*
-	Author: Ryan - David Reyes
-	Co-Author: Dr. Oscar Chuy (maxonDriver.h)
+  Author: Ryan - David Reyes
+  Co-Author: Dr. Oscar Chuy (maxonDriver.h)
 */
 
 #include <iostream>
@@ -28,22 +28,22 @@ const int DATA_ERROR = -1;
 
 //quick reference variables for ascii characters
 const char CTRL_J = 10;
-const char SPACE = ' ';	
-char MA[2]= {'m','a'};	//command for motor move absolute
+const char SPACE = ' '; 
+char MA[2]= {'m','a'};  //command for motor move absolute
 
 const int STEERING_CENTER=0;
 
 
 //*FUNCTION PROTOTYPES
 //initializes all connections and motors 
-bool init(	unsigned int & serialPort, 
-		TCP & tcpConnection, 
-		unsigned int & clientSocket);
+bool init(  unsigned int & serialPort, 
+    TCP & tcpConnection, 
+    unsigned int & clientSocket);
 
 void motorControl(unsigned int & serialPort, char messageType, int value);
 void resetMotors(unsigned int & serialPort);
 
-void debugprint(const int messageType, const int value);
+void debugprint(const char messageType, const int value);
 //*END FUNCTION PROTOTYPES
 
 
@@ -51,106 +51,104 @@ void debugprint(const int messageType, const int value);
 //*MAIN*//
 int main()
 {
-	bool active = true; //flag that controls main loop
-	int value;
-	char messageType;
+  bool active = true; //flag that controls main loop
+  int value;
+  char messageType;
 
-	unsigned int serialPort;
+  unsigned int serialPort;
 
-	TCP tcpConnection;
-	unsigned int clientSocket;
+  TCP tcpConnection;
+  unsigned int clientSocket;
 
-	init(serialPort, tcpConnection, clientSocket); //init everything
+  init(serialPort, tcpConnection, clientSocket); //init everything
 
-	while (active)
-	{
-		tcpConnection.receiveData(	clientSocket, 
-						(char *) &messageType, 
-						sizeof(messageType));
+  while (active)
+  {
+    tcpConnection.receiveData(clientSocket, (char *) &messageType, 
+                              sizeof(messageType));
 
-		if(tcpConnection.receiveData(	clientSocket, 
-						(char *) &value, 
-						sizeof(value)) == DATA_ERROR);
-		{
-			active = false;
-			std::cout << "Client Disconnected!" << std::endl;
-		}
+    if(tcpConnection.receiveData( clientSocket, (char *) &value, 
+                                  sizeof(value)) == DATA_ERROR);
+    {
+      active = false;
+      std::cout << "Client Disconnected!" << std::endl;
+    }
 
 #ifdef DEBUG
-		debugprint(messageType, value);
+    debugprint(messageType, value);
 #endif
 
-		if(messageType == 'X')
-			active = false;
+    if(messageType == 'X')
+      active = false;
 
-		else if (active == true)
-		{
+    else if (active == true)
+    {
 
 #ifdef ENABLE_STEERING
-			if (messageType == 'S')
-				Move_Motor_Abs(value);
-			else
+      if (messageType == 'S')
+        Move_Motor_Abs(value);
+      else
 #endif
-				motorControl(serialPort, messageType, value);
-		}
-	}
-	std::cout << "Resetting motors..." << std::endl;
-	resetMotors(serialPort);
+        motorControl(serialPort, messageType, value);
+    }
+  }
+  std::cout << "Resetting motors..." << std::endl;
+  resetMotors(serialPort);
 
 #ifdef ENABLE_STEERING
-	Close_Maxon_Motor_Driver();
+  Close_Maxon_Motor_Driver();
 #endif
 
-	tcpConnection.closeSocket(clientSocket);
+  tcpConnection.closeSocket(clientSocket);
 
-	std::cout << "Terminating..." << std::endl;
-	return 0;
+  std::cout << "Terminating..." << std::endl;
+  return 0;
 }
 //*END MAIN
 
 
 
 //*FUNCTION DEFINITIONS
-bool init(	unsigned int & serialPort, 
-		TCP & tcpConnection, 
-		unsigned int & clientSocket)
+bool init(  unsigned int & serialPort, 
+    TCP & tcpConnection, 
+    unsigned int & clientSocket)
 {
 #ifdef ENABLE_SERIAL
-	//initialize serial port
-	serialPort = open_port(SERIAL_ADDR);
+  //initialize serial port
+  serialPort = open_port(SERIAL_ADDR);
 
-	if (init_serial_port(serialPort) == DATA_ERROR)
-		return false;
+  if (init_serial_port(serialPort) == DATA_ERROR)
+    return false;
 #endif
 
-	//initialize TCPIP Connection
-	std::cout << "Waiting for TCPIP client..." << std::endl;
-	
-	tcpConnection.listenToPort(PORT);
-	clientSocket = tcpConnection.acceptConnection();
+  //initialize TCPIP Connection
+  std::cout << "Waiting for TCPIP client..." << std::endl;
+  
+  tcpConnection.listenToPort(PORT);
+  clientSocket = tcpConnection.acceptConnection();
 
-	if (clientSocket != SOCKET_ERROR)
-		std::cout << "Connection accepted" << std::endl;
-	
-	else 
-	{
-		std::cout << "Failed to accept client" << std::endl;
-		tcpConnection.closeSocket(clientSocket);
-		return false;
-	}
+  if (clientSocket != SOCKET_ERROR)
+    std::cout << "Connection accepted" << std::endl;
+  
+  else 
+  {
+    std::cout << "Failed to accept client" << std::endl;
+    tcpConnection.closeSocket(clientSocket);
+    return false;
+  }
 
 #ifdef ENABLE_STEERING
-	//initialize Maxon motors
-	Init_Maxon_Motor_Driver();
+  //initialize Maxon motors
+  Init_Maxon_Motor_Driver();
 
-	if (ftStatus != FT_OK)
-	{
-		std::cout << "Steering Motor Failure" << std::endl;
-		return false;
-	}
-	
-	Enable_Maxon_Motor_Driver();
-	//Set_Traj_Params();
+  if (ftStatus != FT_OK)
+  {
+    std::cout << "Steering Motor Failure" << std::endl;
+    return false;
+  }
+  
+  Enable_Maxon_Motor_Driver();
+  //Set_Traj_Params();
 #endif
 }
 
@@ -158,21 +156,21 @@ bool init(	unsigned int & serialPort,
 void motorControl(unsigned int & serialPort, char messageType, int value)
 {
 #ifdef ENABLE_MOTORS
-	//buffer that holds string of commanded motor value
-	char motorvalue[10] = {0};
-	sprintf(motorvalue, "%d", value);
-	
-	//all messages to schneider motors must be encapsulated by ^J
+  //buffer that holds string of commanded motor value
+  char motorvalue[10] = {0};
+  sprintf(motorvalue, "%d", value);
+  
+  //all messages to schneider motors must be encapsulated by ^J
 
-	write(serialPort, (char *) & CTRL_J, 1);
-	write(serialPort, (char *) & messageType, 1);
-	write(serialPort, MA, 2);
+  write(serialPort, (char *) & CTRL_J, 1);
+  write(serialPort, (char *) & messageType, 1);
+  write(serialPort, MA, 2);
 
-	//send only the ascii text, up to null delimiter
-	for (int i = 0; motorvalue[i] != '\0'; i++)
-		write(serialPort, (motorvalue + i), 1);
+  //send only the ascii text, up to null delimiter
+  for (int i = 0; motorvalue[i] != '\0'; i++)
+    write(serialPort, (motorvalue + i), 1);
 
-	write(serialPort, (char *) & CTRL_J, 1);
+  write(serialPort, (char *) & CTRL_J, 1);
 #endif
 }
 
@@ -181,41 +179,41 @@ void motorControl(unsigned int & serialPort, char messageType, int value)
 void resetMotors(unsigned int & serialPort)
 {
 #ifdef ENABLE_MOTORS
-	motorControl(serialPort, 'G', 0);
-	motorControl(serialPort, 'T', 0);
-	motorControl(serialPort, 'B', 0);
+  motorControl(serialPort, 'G', 0);
+  motorControl(serialPort, 'T', 0);
+  motorControl(serialPort, 'B', 0);
 #endif
 
 #ifdef ENABLE_STEERING
-	Move_Motor_Abs(STEERING_CENTER);
+  Move_Motor_Abs(STEERING_CENTER);
 #endif
 }
 
 
 //prints all the values of each component to screen
-void debugprint(const int messageType, const int value)
+void debugprint(const char messageType, const int value)
 {
-	int steerVal = 0, throttleVal = 0, brakeVal = 0, gearVal = 0;
-	switch(messageType)
-	{
-		case 'G':
-			gearVal = value;
-			break;
-				
-		case 'T':
-			throttleVal = value;
-			break;
-		
-		case 'B':
-			brakeVal = value;
-			break;
-		
-		case 'S':
-			steerVal = value;
-			break;
+  int steerVal = 0, throttleVal = 0, brakeVal = 0, gearVal = 0;
+  switch(messageType)
+  {
+    case 'G':
+      gearVal = value;
+      break;
+        
+    case 'T':
+      throttleVal = value;
+      break;
+    
+    case 'B':
+      brakeVal = value;
+      break;
+    
+    case 'S':
+      steerVal = value;
+      break;
 
-	}
-	std::cout << "Msg: " << messageType << "\tThrottle: " << throttleVal;
-	std::cout << "\tGear: " << gearVal << "\tBrake: " << brakeVal;
-	std::cout << "\tSteering: " << steerVal << std::endl;
+  }
+  std::cout << "Msg: " << messageType << "\tThrottle: " << throttleVal;
+  std::cout << "\tGear: " << gearVal << "\tBrake: " << brakeVal;
+  std::cout << "\tSteering: " << steerVal << std::endl;
 }
