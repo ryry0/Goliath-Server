@@ -24,7 +24,7 @@ const int PORT = 65534;
 
 char * SERIAL_ADDR= "/dev/ser1";
 const int SOCKET_ERROR = -1;
-const int DATA_ERROR = -1;
+const int DATA_ERROR = 0;
 
 //quick reference variables for ascii characters
 const char CTRL_J = 10;
@@ -68,7 +68,7 @@ int main()
                               sizeof(messageType));
 
     if(tcpConnection.receiveData( clientSocket, (char *) &value, 
-                                  sizeof(value)) == DATA_ERROR);
+                                  sizeof(value))== DATA_ERROR)
     {
       active = false;
       std::cout << "Client Disconnected!" << std::endl;
