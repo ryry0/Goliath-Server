@@ -14,8 +14,8 @@
 //These definitions enable motors, extra debug, etc at compile time.
 //#define ENABLE_STEERING
 #define DEBUG
-//#define ENABLE_MOTORS
-//#define ENABLE_SERIAL
+#define ENABLE_MOTORS
+#define ENABLE_SERIAL
 
 #ifdef ENABLE_STEERING
 #include "maxonDriver.h"
@@ -25,6 +25,7 @@
 const int PORT = 65534;
 const int SOCKET_ERROR  = -1;
 const int DATA_ERROR    = 0;
+const int SERIAL_ERROR  = -1;
 
 //quick reference variables for ascii characters
 const char CTRL_J   = 10;
@@ -147,7 +148,7 @@ bool initSerial( unsigned int & serialPort, char * serialAddr )
   //initialize serial port
   serialPort = open_port(serialAddr);
 
-  if (init_serial_port(serialPort) == DATA_ERROR)
+  if (init_serial_port(serialPort) == SERIAL_ERROR)
     return false;
   else 
     return true;
@@ -167,6 +168,9 @@ bool initMotors()
   //Set_Traj_Params();
   return true;
 #endif
+#ifndef ENABLE_STEERING 
+  return true;
+#endif 
 }
 
 bool initTCP( TCP & tcpConnection, unsigned int & clientSocket )
