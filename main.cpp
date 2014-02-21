@@ -36,9 +36,9 @@ const int STEERING_CENTER = 0;
 
 //*FUNCTION PROTOTYPES
 //initializes all connections and motors 
-bool init(  unsigned int & serialPort, 
-            TCP & tcpConnection, 
-            unsigned int & clientSocket);
+bool initSerial(  unsigned int & serialPort );
+bool initTCP( TCP & tcpConnection, unsigned int & clientSocket );
+bool initMotors();
 
 void motorControl(unsigned int & serialPort, char messageType, int value);
 void resetMotors(unsigned int & serialPort);
@@ -111,9 +111,7 @@ int main(int argc, char * argv[])
 
 
 //*FUNCTION DEFINITIONS
-bool init(  unsigned int & serialPort, 
-            TCP & tcpConnection, 
-            unsigned int & clientSocket)
+bool initSerial( unsigned int & serialPort )
 {
 #ifdef ENABLE_SERIAL
   //initialize serial port
@@ -121,24 +119,13 @@ bool init(  unsigned int & serialPort,
 
   if (init_serial_port(serialPort) == DATA_ERROR)
     return false;
-#endif
-
-  //initialize TCPIP Connection
-  std::cout << "Waiting for TCPIP client..." << std::endl;
-  
-  tcpConnection.listenToPort(PORT);
-  clientSocket = tcpConnection.acceptConnection();
-
-  if (clientSocket != SOCKET_ERROR)
-    std::cout << "Connection accepted" << std::endl;
-  
   else 
-  {
-    std::cout << "Failed to accept client" << std::endl;
-    tcpConnection.closeSocket(clientSocket);
-    return false;
-  }
+    return true;
+#endif
+}
 
+bool initMotors()
+{
 #ifdef ENABLE_STEERING
   //initialize Maxon motors
   Init_Maxon_Motor_Driver();
@@ -151,9 +138,31 @@ bool init(  unsigned int & serialPort,
   
   Enable_Maxon_Motor_Driver();
   //Set_Traj_Params();
+  return true;
 #endif
 }
 
+bool initTCP( TCP & tcpConnection, unsigned int & clientSocket )
+{
+  //initialize TCPIP Connection
+  std::cout << "Waiting for TCPIP client..." << std::endl;
+  
+  tcpConnection.listenToPort(PORT);
+  clientSocket = tcpConnection.acceptConnection();
+
+  if (clientSocket != SOCKET_ERROR)
+  {
+    std::cout << "Connection accepted" << std::endl;
+    return true;
+  }
+  
+  else 
+  {
+    std::cout << "Failed to accept client" << std::endl;
+    tcpConnection.closeSocket(clientSocket);
+    return false;
+  }
+}
 
 void motorControl(unsigned int & serialPort, char messageType, int value)
 {
