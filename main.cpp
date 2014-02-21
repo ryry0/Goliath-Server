@@ -37,8 +37,8 @@ const int STEERING_CENTER=0;
 //*FUNCTION PROTOTYPES
 //initializes all connections and motors 
 bool init(  unsigned int & serialPort, 
-    TCP & tcpConnection, 
-    unsigned int & clientSocket);
+            TCP & tcpConnection, 
+            unsigned int & clientSocket);
 
 void motorControl(unsigned int & serialPort, char messageType, int value);
 void resetMotors(unsigned int & serialPort);
@@ -49,7 +49,7 @@ void debugprint(const char messageType, const int value);
 
 
 //*MAIN*//
-int main()
+int main(int argc, char * argv[])
 {
   bool active = true; //flag that controls main loop
   int value;
