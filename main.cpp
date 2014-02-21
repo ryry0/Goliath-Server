@@ -22,16 +22,16 @@
 
 const int PORT = 65534;
 
-char * SERIAL_ADDR= "/dev/ser1";
-const int SOCKET_ERROR = -1;
-const int DATA_ERROR = 0;
+char * SERIAL_ADDR      = "/dev/ser1";
+const int SOCKET_ERROR  = -1;
+const int DATA_ERROR    = 0;
 
 //quick reference variables for ascii characters
-const char CTRL_J = 10;
-const char SPACE = ' '; 
-char MA[2]= {'m','a'};  //command for motor move absolute
+const char CTRL_J   = 10;
+const char SPACE    = ' '; 
+char MA[2]          = {'m','a'};  //command for motor move absolute
 
-const int STEERING_CENTER=0;
+const int STEERING_CENTER = 0;
 
 
 //*FUNCTION PROTOTYPES
@@ -64,11 +64,13 @@ int main(int argc, char * argv[])
 
   while (active)
   {
-    tcpConnection.receiveData(clientSocket, (char *) &messageType, 
-                              sizeof(messageType));
+    tcpConnection.receiveData(  clientSocket, 
+                                (char *) &messageType, 
+                                sizeof( messageType ));
 
-    if(tcpConnection.receiveData( clientSocket, (char *) &value, 
-                                  sizeof(value))== DATA_ERROR)
+    if(tcpConnection.receiveData( clientSocket, 
+                                  (char *) &value, 
+                                  sizeof( value )) == DATA_ERROR)
     {
       active = false;
       std::cout << "Client Disconnected!" << std::endl;
@@ -110,8 +112,8 @@ int main(int argc, char * argv[])
 
 //*FUNCTION DEFINITIONS
 bool init(  unsigned int & serialPort, 
-    TCP & tcpConnection, 
-    unsigned int & clientSocket)
+            TCP & tcpConnection, 
+            unsigned int & clientSocket)
 {
 #ifdef ENABLE_SERIAL
   //initialize serial port
