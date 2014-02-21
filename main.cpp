@@ -66,12 +66,12 @@ int main(int argc, char * argv[])
   //Parse the arguments
   switch (argc)
   {
-    case 1:
-      serialAddr = argv[0];   
+    case 2:
+      serialAddr = argv[1];   
       break;
   }
 
-  if ( argc >= 1 )
+  if ( argc >= 2 )
   {
     if ( initSerial(serialPort, serialAddr) == false )
     {
