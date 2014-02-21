@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
+#include <cstring>
 
 #include "tcpipnix.h"
 #include "serialnix.h"
@@ -20,9 +21,8 @@
 #include "maxonDriver.h"
 #endif
 
-const int PORT = 65534;
 
-char * SERIAL_ADDR      = "/dev/ser1";
+const int PORT = 65534;
 const int SOCKET_ERROR  = -1;
 const int DATA_ERROR    = 0;
 
@@ -36,7 +36,7 @@ const int STEERING_CENTER = 0;
 
 //*FUNCTION PROTOTYPES
 //initializes all connections and motors 
-bool initSerial(  unsigned int & serialPort );
+bool initSerial(  unsigned int & serialPort, char * serialAddr );
 bool initTCP( TCP & tcpConnection, unsigned int & clientSocket );
 bool initMotors();
 
@@ -52,15 +52,44 @@ void debugprint(const char messageType, const int value);
 int main(int argc, char * argv[])
 {
   bool active = true; //flag that controls main loop
-  int value;
+  int value;          //value of received message
   char messageType;
 
-  unsigned int serialPort;
+  unsigned int  serialPort;
+
+  char * serialAddr = "/dev/ser1";
 
   TCP tcpConnection;
   unsigned int clientSocket;
 
-  init(serialPort, tcpConnection, clientSocket); //init everything
+  //Initialization 
+  //Parse the arguments
+  switch (argc)
+  {
+    case 1:
+      serialAddr = argv[0];   
+      break;
+  }
+
+  if ( argc >= 1 )
+  {
+    if ( initSerial(serialPort, serialAddr) == false )
+    {
+      std::cout << "Serial port initialization failure.\n";
+      return 0;
+    }
+    if ( initMotors() == false );
+    {
+      std::cout << "Motor initialization failure.\n";
+      return 0;
+    }
+  }
+
+  if ( initTCP(tcpConnection, clientSocket) == false )
+  {
+    std::cout << "TCPIP initialization failure.\n";
+    return 0;
+  }
 
   while (active)
   {
@@ -92,6 +121,7 @@ int main(int argc, char * argv[])
       else
 #endif
         motorControl(serialPort, messageType, value);
+        //watch out for this!
     }
   }
   std::cout << "Resetting motors..." << std::endl;
@@ -111,11 +141,11 @@ int main(int argc, char * argv[])
 
 
 //*FUNCTION DEFINITIONS
-bool initSerial( unsigned int & serialPort )
+bool initSerial( unsigned int & serialPort, char * serialAddr )
 {
 #ifdef ENABLE_SERIAL
   //initialize serial port
-  serialPort = open_port(SERIAL_ADDR);
+  serialPort = open_port(serialAddr);
 
   if (init_serial_port(serialPort) == DATA_ERROR)
     return false;
@@ -131,10 +161,7 @@ bool initMotors()
   Init_Maxon_Motor_Driver();
 
   if (ftStatus != FT_OK)
-  {
-    std::cout << "Steering Motor Failure" << std::endl;
     return false;
-  }
   
   Enable_Maxon_Motor_Driver();
   //Set_Traj_Params();
