@@ -79,7 +79,7 @@ int main(int argc, char * argv[])
       std::cout << "Serial port initialization failure.\n";
       return 0;
     }
-    if ( initMotors() == false );
+    if ( initMotors() == false )
     {
       std::cout << "Motor initialization failure.\n";
       return 0;
