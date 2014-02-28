@@ -209,6 +209,7 @@ void motorControl(unsigned int & serialPort, char messageType, int value)
   write(serialPort, MA, 2);
 
   //send only the ascii text, up to null delimiter
+  write(serialPort, SPACE, 1);
   for (int i = 0; motorvalue[i] != '\0'; i++)
     write(serialPort, (motorvalue + i), 1);
 
