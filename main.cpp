@@ -29,14 +29,14 @@ const int SERIAL_ERROR  = -1;
 
 //quick reference variables for ascii characters
 const char CTRL_J   = 10;
-const char SPACE    = ' '; 
+const char SPACE    = ' ';
 char MA[2]          = {'m','a'};  //command for motor move absolute
 
 const int STEERING_CENTER = 0;
 
 
 //*FUNCTION PROTOTYPES
-//initializes all connections and motors 
+//initializes all connections and motors
 bool initSerial(  unsigned int & serialPort, char * serialAddr );
 bool initTCP( TCP & tcpConnection, unsigned int & clientSocket );
 bool initMotors();
@@ -63,12 +63,12 @@ int main(int argc, char * argv[])
   TCP tcpConnection;
   unsigned int clientSocket;
 
-  //Initialization 
+  //Initialization
   //Parse the arguments
   switch (argc)
   {
     case 2:
-      serialAddr = argv[1];   
+      serialAddr = argv[1];
       break;
   }
 
@@ -94,12 +94,12 @@ int main(int argc, char * argv[])
 
   while (active)
   {
-    tcpConnection.receiveData(  clientSocket, 
-                                (char *) &messageType, 
+    tcpConnection.receiveData(  clientSocket,
+                                (char *) &messageType,
                                 sizeof( messageType ));
 
-    if(tcpConnection.receiveData( clientSocket, 
-                                  (char *) &value, 
+    if(tcpConnection.receiveData( clientSocket,
+                                  (char *) &value,
                                   sizeof( value )) == DATA_ERROR)
     {
       active = false;
@@ -150,7 +150,7 @@ bool initSerial( unsigned int & serialPort, char * serialAddr )
 
   if (init_serial_port(serialPort) == SERIAL_ERROR)
     return false;
-  else 
+  else
     return true;
 #endif
 }
@@ -163,21 +163,21 @@ bool initMotors()
 
   if (ftStatus != FT_OK)
     return false;
-  
+
   Enable_Maxon_Motor_Driver();
   //Set_Traj_Params();
   return true;
 #endif
-#ifndef ENABLE_STEERING 
+#ifndef ENABLE_STEERING
   return true;
-#endif 
+#endif
 }
 
 bool initTCP( TCP & tcpConnection, unsigned int & clientSocket )
 {
   //initialize TCPIP Connection
   std::cout << "Waiting for TCPIP client..." << std::endl;
-  
+
   tcpConnection.listenToPort(PORT);
   clientSocket = tcpConnection.acceptConnection();
 
@@ -186,8 +186,8 @@ bool initTCP( TCP & tcpConnection, unsigned int & clientSocket )
     std::cout << "Connection accepted" << std::endl;
     return true;
   }
-  
-  else 
+
+  else
   {
     std::cout << "Failed to accept client" << std::endl;
     tcpConnection.closeSocket(clientSocket);
@@ -201,7 +201,7 @@ void motorControl(unsigned int & serialPort, char messageType, int value)
   //buffer that holds string of commanded motor value
   char motorvalue[10] = {0};
   sprintf(motorvalue, "%d", value);
-  
+
   //all messages to schneider motors must be encapsulated by ^J
 
   write(serialPort, (char *) & CTRL_J, 1);
@@ -241,15 +241,15 @@ void debugprint(const char messageType, const int value)
     case 'G':
       gearVal = value;
       break;
-        
+
     case 'T':
       throttleVal = value;
       break;
-    
+
     case 'B':
       brakeVal = value;
       break;
-    
+
     case 'S':
       steerVal = value;
       break;
