@@ -14,6 +14,6 @@ screen. Useful for debug.
 
 TODO
 
-1) Options
-2) Steering Motor.
-3) Heartbeat
+1) Steering Motor.
+	a) compile the correct linux library
+2) Heartbeat
