@@ -12,7 +12,7 @@
 #include "serialnix.h"
 
 //These definitions enable motors, extra debug, etc at compile time.
-#define ENABLE_STEERING
+//#define ENABLE_STEERING
 #define DEBUG
 #define ENABLE_MOTORS
 #define ENABLE_SERIAL
@@ -210,7 +210,7 @@ void motorControl(unsigned int & serialPort, char messageType, int value)
   write(serialPort, MA, 2);
 
   //send only the ascii text, up to null delimiter
-  write(serialPort, SPACE, 1);
+  write(serialPort, (char *) &SPACE, 1);
   for (int i = 0; motorvalue[i] != '\0'; i++)
     write(serialPort, (motorvalue + i), 1);
 
