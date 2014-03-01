@@ -2,7 +2,8 @@ SOURCE_EXT=cpp
 HEAD_EXT=h
 CC=g++
 CFLAGS=-c
-LDFLAGS=-L./lib -lFTPChipID -lFTD2XX
+LDFLAGS=
+#-L./lib -lFTPChipID -lFTD2XX
 
 EXECUTABLE=Goliath_Server
 
