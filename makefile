@@ -1,8 +1,8 @@
 SOURCE_EXT=cpp
 HEAD_EXT=h
 CC=g++
-CFLAGS=-c  
-LDFLAGS=
+CFLAGS=-c
+LDFLAGS=-L./lib -lFTPChipID -lFTD2XX
 
 EXECUTABLE=Goliath_Server
 
@@ -19,23 +19,23 @@ debug: $(SOURCES) $(EXECUTABLE)
 $(EXECUTABLE): $(SOURCES) $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-%.o: %.cpp 
+%.o: %.cpp
 	$(CC) $(CFLAGS) $< -o $@
 
 cleanall: clean
 	rm -f $(EXECUTABLE)
-	
+
 proper: clean
 	rm -f $(EXECUTABLE)
 
 re: proper all
 
 redo: proper debug
-	
+
 clean:
 	rm -f *.o *.gch
 
-run: 
+run:
 	./$(EXECUTABLE)
 
 test:
