@@ -2,8 +2,8 @@
 //#include "stdafx.h"
 //#include <windows.h>
 #include <stdio.h>
-//#include "ftd2xx.h"
-//#include "FTChipID.h"
+#include "FTD2XX.h"
+#include "FTChipID.h"
 #include <iostream>
 //#include <conio.h>
 
