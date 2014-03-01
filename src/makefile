@@ -1,7 +1,7 @@
 SOURCE_EXT=cpp
 HEAD_EXT=h
 CC=g++
-CFLAGS=-c
+CFLAGS=-c -I../inc
 LDFLAGS=
 #-L./lib -lFTPChipID -lFTD2XX
 

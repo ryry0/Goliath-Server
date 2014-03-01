@@ -7,7 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "tcpipnix.h"
+#include <tcpipnix.h>
 const int INVALID_SOCKET = -1;
 const int SOCKET_ERROR = -1;
 

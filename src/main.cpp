@@ -8,8 +8,8 @@
 #include <string>
 #include <cstring>
 
-#include "tcpipnix.h"
-#include "serialnix.h"
+#include <tcpipnix.h>
+#include <serialnix.h>
 
 //These definitions enable motors, extra debug, etc at compile time.
 //#define ENABLE_STEERING
@@ -18,8 +18,8 @@
 #define ENABLE_SERIAL
 
 #ifdef ENABLE_STEERING
-#include "WinTypes.h"
-#include "maxonDriverNix.h"
+#include <WinTypes.h>
+#include <maxonDriverNix.h>
 #endif
 
 
