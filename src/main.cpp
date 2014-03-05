@@ -12,13 +12,14 @@
 #include <serialnix.h>
 
 //These definitions enable motors, extra debug, etc at compile time.
-//#define ENABLE_STEERING
+#define ENABLE_STEERING
 #define DEBUG
 #define ENABLE_MOTORS
 #define ENABLE_SERIAL
 
 #ifdef ENABLE_STEERING
 #include <WinTypes.h>
+#include <ftd2xx.h>
 #include <maxonDriverNix.h>
 #endif
 

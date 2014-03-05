@@ -2,16 +2,13 @@
 //#include "stdafx.h"
 //#include <windows.h>
 #include <stdio.h>
-#include "FTD2XX.h"
-#include "FTChipID.h"
+#include <ftd2xx.h>
 #include <iostream>
 //#include <conio.h>
 
 
 
-using namespace std;
-
-FTID_STATUS dStatus;
+//FTDI_STATUS dStatus;
 FT_HANDLE ftHandle_MAXON;
 FT_STATUS ftStatus;
 
