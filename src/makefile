@@ -1,9 +1,8 @@
 SOURCE_EXT=cpp
 HEAD_EXT=h
 CC=g++
-CFLAGS=-c -I../inc
-LDFLAGS=
-#-L./lib -lFTPChipID -lFTD2XX
+CFLAGS=-c -I../inc -I../libnix
+LDFLAGS= -L../libnix/build/x86_64/ -lftd2xx -Wl,-rpath=.
 
 EXECUTABLE=Goliath_Server
 
