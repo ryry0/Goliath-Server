@@ -160,13 +160,14 @@ bool initSerial( unsigned int & serialPort, char * serialAddr )
 bool initMotors()
 {
 #ifdef ENABLE_STEERING
+  List_Devices();
   //initialize Maxon motors
-  Init_Maxon_Motor_Driver();
+  //Init_Maxon_Motor_Driver();
 
   if (ftStatus != FT_OK)
     return false;
 
-  Enable_Maxon_Motor_Driver();
+  //Enable_Maxon_Motor_Driver();
   //Set_Traj_Params();
   return true;
 #endif
@@ -201,21 +202,15 @@ void motorControl(unsigned int & serialPort, char messageType, int value)
 {
 #ifdef ENABLE_MOTORS
   //buffer that holds string of commanded motor value
+  char buffer[15] = "\0";
   char motorvalue[10] = {0};
-  sprintf(motorvalue, "%d", value);
 
-  //all messages to schneider motors must be encapsulated by ^J
-
-  write(serialPort, (char *) & CTRL_J, 1);
-  write(serialPort, (char *) & messageType, 1);
-  write(serialPort, MA, 2);
+  //write message type to the buffer
+  //all messages to schneider motors must be encapsulated by ^J (\n)
+  sprintf(buffer, "\n%cma %d\n", messageType, value);
 
   //send only the ascii text, up to null delimiter
-  write(serialPort, (char *) &SPACE, 1);
-  for (int i = 0; motorvalue[i] != '\0'; i++)
-    write(serialPort, (motorvalue + i), 1);
-
-  write(serialPort, (char *) & CTRL_J, 1);
+  write(serialPort, buffer, strlen(buffer));
 #endif
 }
 
