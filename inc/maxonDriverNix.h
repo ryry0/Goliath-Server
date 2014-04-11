@@ -7,6 +7,7 @@
 //#include <conio.h>
 
 
+#define MAX_DEVICES		5
 
 //FTDI_STATUS dStatus;
 FT_HANDLE ftHandle_MAXON;
@@ -17,18 +18,42 @@ FT_STATUS ftStatus;
 
 
 
+void List_Devices(void)
+{
+  int num_devices;
+	char * 	pcBufLD[MAX_DEVICES + 1];
+	char 	cBufLD[MAX_DEVICES][64];
+
+	for(int i = 0; i < MAX_DEVICES; i++) //initialize the information buffers.
+		pcBufLD[i] = cBufLD[i];
+
+	pcBufLD[MAX_DEVICES] = NULL;
+
+	ftStatus = FT_ListDevices(pcBufLD, &num_devices, FT_LIST_ALL | FT_OPEN_BY_SERIAL_NUMBER);
+
+	if(ftStatus != FT_OK)
+		printf("Error: FT_ListDevices(%d)\n", (int)ftStatus);
+
+	for(int i = 0; ( (i <MAX_DEVICES) && (i < num_devices) ); i++)
+		printf("Device %d Serial Number - %s\n", i, cBufLD[i]);
+
+}
 
 void Init_Maxon_Motor_Driver(void)
 {
-    char * serialNum = "602095000131";
-    ftStatus = FT_OpenEx(serialNum,FT_OPEN_BY_SERIAL_NUMBER,&ftHandle_MAXON);
+  char * serialNum = "602095000131";
+  /*
+     This can fail if the ftdi_sio driver is loaded
+     use lsmod to check this and rmmod ftdi_sio to remove
+     also rmmod usbserial
+     */
+  ftStatus = FT_OpenEx(serialNum,FT_OPEN_BY_SERIAL_NUMBER,&ftHandle_MAXON);
 
-    if (ftStatus == FT_OK)
+  if (ftStatus == FT_OK)
+    printf("Device Successfully Open\n");
 
-        printf("Device Successfully Open\n");
-
-    else
-        printf("Failure to Open\n");
+  else
+    printf("Failure to Open\n");
 
 }
 
