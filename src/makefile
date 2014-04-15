@@ -2,7 +2,7 @@ SOURCE_EXT=cpp
 HEAD_EXT=h
 CC=g++
 CFLAGS=-c -I../inc -I../libnix
-LDFLAGS= -L../libnix/build/x86_64/ -lftd2xx -Wl,-rpath=.
+LDFLAGS= libftd2xx.a -lpthread -lrt -ldl #-Wl,-rpath=.
 
 EXECUTABLE=Goliath_Server
 
@@ -17,7 +17,7 @@ debug: CFLAGS += -DDEBUG -g -Wall
 debug: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES) $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS) 
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $< -o $@
