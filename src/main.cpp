@@ -26,7 +26,7 @@
 
 const int PORT = 65534;
 const int SOCKET_ERROR  = -1;
-const int DATA_ERROR    = 0;
+const int DATA_ERROR    = -1;
 const int SERIAL_ERROR  = -1;
 
 //quick reference variables for ascii characters
@@ -40,7 +40,6 @@ const int STEERING_CENTER = 0;
 //*FUNCTION PROTOTYPES
 //initializes all connections and motors
 bool initSerial(  unsigned int & serialPort, char * serialAddr );
-bool initTCP( TCP & tcpConnection, unsigned int & clientSocket );
 bool initMotors();
 
 void motorControl(unsigned int & serialPort, char messageType, int value);
@@ -51,31 +50,24 @@ void debugprint(const char messageType, const int value);
 
 
 
-//*MAIN*//
+//*MAIN*////////////////////////////////////////////////////////
 int main(int argc, char * argv[])
 {
   bool active = true; //flag that controls main loop
   int value;          //value of received message
   char messageType;
+  int pipefd;
 
   unsigned int  serialPort;
 
   char * serialAddr = "/dev/ser1";
-
-  TCP tcpConnection;
-  unsigned int clientSocket;
+  char * pipeAddr = "../pipe";
 
   //Initialization
   //Parse the arguments
-  switch (argc)
-  {
-    case 2:
-      serialAddr = argv[1];
-      break;
-  }
-
   if ( argc >= 2 )
   {
+    serialAddr = argv[1];
     if ( initSerial(serialPort, serialAddr) == false )
     {
       std::cout << "Serial port initialization failure.\n";
@@ -88,21 +80,16 @@ int main(int argc, char * argv[])
     }
   }
 
-  if ( initTCP(tcpConnection, clientSocket) == false )
-  {
-    std::cout << "TCPIP initialization failure.\n";
-    return 0;
-  }
+  pipefd = open_port(pipeAddr);
 
   while (active)
   {
-    tcpConnection.receiveData(  clientSocket,
-                                (char *) &messageType,
-                                sizeof( messageType ));
+    //read letter
+    read(pipefd, (char *) &messageType, sizeof(messageType));
 
-    if(tcpConnection.receiveData( clientSocket,
-                                  (char *) &value,
-                                  sizeof( value )) == DATA_ERROR)
+    //read number
+    int numread = read(pipefd, (char *) &value, sizeof(value));
+    if(numread == DATA_ERROR)
     {
       active = false;
       std::cout << "Client Disconnected!" << std::endl;
@@ -134,12 +121,11 @@ int main(int argc, char * argv[])
   Close_Maxon_Motor_Driver();
 #endif
 
-  tcpConnection.closeSocket(clientSocket);
-
   std::cout << "Terminating..." << std::endl;
+  close(pipefd);
   return 0;
 }
-//*END MAIN
+//*END MAIN////////////////////////////////////////////////
 
 
 
@@ -160,9 +146,9 @@ bool initSerial( unsigned int & serialPort, char * serialAddr )
 bool initMotors()
 {
 #ifdef ENABLE_STEERING
-  List_Devices();
   //initialize Maxon motors
-  //Init_Maxon_Motor_Driver();
+  List_Devices();
+  Init_Maxon_Motor_Driver();
 
   if (ftStatus != FT_OK)
     return false;
@@ -174,28 +160,6 @@ bool initMotors()
 #ifndef ENABLE_STEERING
   return true;
 #endif
-}
-
-bool initTCP( TCP & tcpConnection, unsigned int & clientSocket )
-{
-  //initialize TCPIP Connection
-  std::cout << "Waiting for TCPIP client..." << std::endl;
-
-  tcpConnection.listenToPort(PORT);
-  clientSocket = tcpConnection.acceptConnection();
-
-  if (clientSocket != SOCKET_ERROR)
-  {
-    std::cout << "Connection accepted" << std::endl;
-    return true;
-  }
-
-  else
-  {
-    std::cout << "Failed to accept client" << std::endl;
-    tcpConnection.closeSocket(clientSocket);
-    return false;
-  }
 }
 
 void motorControl(unsigned int & serialPort, char messageType, int value)
@@ -251,7 +215,6 @@ void debugprint(const char messageType, const int value)
     case 'S':
       steerVal = value;
       break;
-
   }
   std::cout << "Msg: " << messageType << "\tThrottle: " << throttleVal;
   std::cout << "\tGear: " << gearVal << "\tBrake: " << brakeVal;
