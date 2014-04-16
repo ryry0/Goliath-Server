@@ -61,7 +61,7 @@ int main(int argc, char * argv[])
   unsigned int  serialPort;
 
   char * serialAddr = "/dev/ser1";
-  char * pipeAddr = "../pipe";
+  char * pipeAddr = "/tmp/goliath";
 
   //Initialization
   //Parse the arguments
