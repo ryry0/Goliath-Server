@@ -147,14 +147,14 @@ bool initMotors()
 {
 #ifdef ENABLE_STEERING
   //initialize Maxon motors
-  List_Devices();
+  //List_Devices();
   Init_Maxon_Motor_Driver();
 
   if (ftStatus != FT_OK)
     return false;
 
-  //Enable_Maxon_Motor_Driver();
-  //Set_Traj_Params();
+  Enable_Maxon_Motor_Driver();
+  Set_Traj_Params();
   return true;
 #endif
 #ifndef ENABLE_STEERING
