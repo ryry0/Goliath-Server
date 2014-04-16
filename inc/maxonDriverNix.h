@@ -18,9 +18,9 @@ FT_STATUS ftStatus;
 //unsigned char  TxBuffer1[14] = {0x90,0x02,0x11,0x04,0x40,0x60,0x00,0x00,0x7f,0x00,0x00,0x00,0x85,0xb1};
 unsigned short int CalFieldCRC(unsigned short int *pDataArray, int number_of_data);
 void Command_Maxon_Driver4w(unsigned char, unsigned char *);
-void Command_Maxon_Driver(unsigned char *, unsigned char *, int );
-
-
+void Command_Maxon_Driver(unsigned char * command_buffer,
+                          unsigned char * read_buffer = NULL,
+                          int length_to_read = 0);
 
 void List_Devices(void)
 {
@@ -52,11 +52,13 @@ void Init_Maxon_Motor_Driver(void)
      use lsmod to check this and rmmod ftdi_sio to remove
      also rmmod usbserial
      */
+
   ftStatus = FT_SetVIDPID(0x0403, 0xa8b0);
   if (ftStatus != FT_OK)
     printf("Could not set device VID and PID");
 
   ftStatus = FT_OpenEx(serialNum,FT_OPEN_BY_SERIAL_NUMBER,&ftHandle_MAXON);
+  ftStatus = FT_SetBaudRate(ftHandle_MAXON, 1000000);
 
   if (ftStatus == FT_OK)
     printf("Device Successfully Opened\n");
@@ -86,19 +88,17 @@ void Enable_Maxon_Motor_Driver(void)
     {0x10, 0x02, 0x41, 0x60, 0x00, 0x00};
   unsigned char status_buffer[14] = {0};
 
-  //Command_Maxon_Driver(check_status, status_buffer, 1);
-  /*
+  Command_Maxon_Driver(check_status, status_buffer, 14);
   for (int i = 0; i < 14; i ++)
     printf("%x ", status_buffer[i]);
-    */
 
+  /*
   //shutdown
   unsigned char TxBuffer_Enable1[14] = {0x90,0x02,0x11,0x04,0x40,0x60,0x00,0x00,0x06,0x00,0x00,0x00,0x1c,0xf7};
   //switch on and enable operation
   unsigned char TxBuffer_Enable2[14] = {0x90,0x02,0x11,0x04,0x40,0x60,0x00,0x00,0x0f,0x00,0x00,0x00,0x8d,0x69};
   unsigned char TxBuffer_Enable3[14] = {0x90,0x02,0x11,0x04,0x40,0x60,0x00,0x00,0x0f,0x01,0x00,0x00,0x39,0x1f};
 
-  /*
   ftStatus = FT_Write(ftHandle_MAXON,TxBuffer_Enable1,14,&BytesWritten_Enable);
   ftStatus = FT_Write(ftHandle_MAXON,TxBuffer_Enable2,14,&BytesWritten_Enable);
   ftStatus = FT_Write(ftHandle_MAXON,TxBuffer_Enable3,14,&BytesWritten_Enable);
@@ -106,18 +106,16 @@ void Enable_Maxon_Motor_Driver(void)
   */
 
   //fault reset
-  Command_Maxon_Driver(shutdown, NULL, 0);
-  Command_Maxon_Driver(shutdown, NULL, 0);
-  Command_Maxon_Driver(enable, NULL, 0);
-  Command_Maxon_Driver(enable, NULL, 0);
+  Command_Maxon_Driver(shutdown);
+  Command_Maxon_Driver(enable);
   printf("Motor Driver Enable\n");
 }
 
 //                    [ byte ][ byte ][ length *words ]
 //a command buffer is [opcode][length][     data      ]
 void Command_Maxon_Driver(unsigned char * command_buffer,
-                          unsigned char * read_buffer = NULL,
-                          int length_to_read = 0)
+                          unsigned char * read_buffer,
+                          int length_to_read)
 {
   //length is number of words the data portion of the buffer has
   unsigned char lengthw = command_buffer[1];
