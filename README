@@ -1,4 +1,3 @@
-
 This program is the serverside implementation of the GOLIATH autonomous vehicle
 control program. It accesses a serial port and FTDI USB chip to control the
 motors, with commands recieved via TCP/IP.
@@ -15,5 +14,4 @@ screen. Useful for debug.
 TODO
 
 1) Options
-2) Steering Motor.
-3) Heartbeat
+2) Heartbeat
